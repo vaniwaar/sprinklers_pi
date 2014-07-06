@@ -300,16 +300,33 @@ void ClearEvents()
 	runState.SetSchedule(false);
 }
 
-// TODO:  Schedules that go past midnight!
-//  Pretty simple.  When we one-shot at midnight, check to see if any outstanding events are at time >1400.  If so, move them
-//  to the top of the event stack and subtract 1440 (24*60) from their times.
+void RemoveEventsNotScheduledAfterMidnight()
+{
+	int newNumEvents = 0;
+	for (int i=0; i < iNumEvents; ++i)
+	{
+		if (events[i].time > 1440)
+		{
+			events[i].time -= 1440;
+			events[newNumEvents++] = events[i];
+	        }
+	}
+	iNumEvents = newNumEvents;
+}
+
 
 // Loads the events for the current day
 void ReloadEvents(bool bAllEvents)
 {
-	ClearEvents();
-	TurnOffZones();
-
+	if (false == bAllEvents)
+	{
+		ClearEvents();
+		TurnOffZones();
+	}
+	else
+	{
+		RemoveEventsNotScheduledAfterMidnight();
+	}
 	// Make sure we're running now
 	if (!GetRunSchedules())
 		return;

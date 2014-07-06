@@ -24,6 +24,8 @@ public:
 		short precipi;
 		short windmph;
 		short UV;
+		int obsTime;
+		int currTime;
 	};
 public:
 	Weather(void);

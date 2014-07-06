@@ -140,6 +140,14 @@ static void ParseResponse(EthernetClient & client, Weather::ReturnVals * ret)
 				{
 					ret->windmph = (atof(val) * 10.0);
 				}
+				else if (strcmp(key, "observation_epoch") == 0)
+				{
+				  	ret->obsTime = atof(val);
+				}
+				else if (strcmp(key, "local_epoch") == 0)
+				{
+				  	ret->currTime = atof(val);
+				}
 				else if (strcmp(key, "type") == 0)
 				{
 					if (strcmp(val, "keynotfound") == 0)
@@ -172,6 +180,17 @@ int Weather::GetScale(const ReturnVals & vals) const
 {
 	if (!vals.valid)
 		return 100;
+
+	char str[1000];
+	int hoursSinceLastUpdate = (vals.currTime - vals.obsTime)/60/60;
+
+	sprintf(str,"hours since last update %d\n", hoursSinceLastUpdate);
+	if (hoursSinceLastUpdate > 1)
+	{
+	  	trace(str);
+	  	return 100;
+	}
+
 	const int humid_factor = 30 - (vals.maxhumidity + vals.minhumidity) / 2;
 	const int temp_factor = (vals.meantempi - 70) * 4;
 	const int rain_factor = (vals.precipi + vals.precip_today) * -2;
